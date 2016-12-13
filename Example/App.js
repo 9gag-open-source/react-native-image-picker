@@ -14,10 +14,13 @@ import ImagePicker from 'react-native-image-picker'
 
 export default class App extends React.Component {
 
-  // state = {
-  //   avatarSource: null,
-  //   videoSource: null
-  // };
+  constructor (props) {
+    super(props)
+    this.state = {
+      avatarSource: null,
+      videoSource: null
+    }
+  }
 
   _selectPhotoByAllTapped () {
     var options = imageOptions
@@ -39,9 +42,9 @@ export default class App extends React.Component {
         } else {
           source = {uri: response.uri.replace('file://', ''), isStatic: true}
         }
-        // this.setState({
-        //   avatarSource: source
-        // })
+        this.setState({
+          avatarSource: source
+        })
       }
     })
   }
@@ -66,9 +69,9 @@ export default class App extends React.Component {
         } else {
           source = {uri: response.uri.replace('file://', ''), isStatic: true}
         }
-        // this.setState({
-        //   avatarSource: source
-        // })
+        this.setState({
+          avatarSource: source
+        })
       }
     })
   }
@@ -93,9 +96,9 @@ export default class App extends React.Component {
         } else {
           source = {uri: response.uri.replace('file://', ''), isStatic: true}
         }
-        // this.setState({
-        //   avatarSource: source
-        // })
+        this.setState({
+          avatarSource: source
+        })
       }
     })
   }
@@ -157,33 +160,39 @@ export default class App extends React.Component {
   render () {
     return (
       <View style={styles.container}>
+        { this.state.avatarSource !== null &&
+          <Image style={styles.image} source={this.state.avatarSource} />
+        }
+        { this.state.videoSource !== null &&
+          <Text style={styles.text}>{this.state.videoSource}</Text>
+        }
         <TouchableOpacity onPress={this._selectPhotoByAllTapped.bind(this)}>
-          <View style={[styles.avatar, styles.avatarContainer]}>
+          <View style={[styles.button, styles.buttonContainer]}>
             <Text>Photo All</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={this._selectPhotoByCameraTapped.bind(this)}>
-          <View style={[styles.avatar, styles.avatarContainer]}>
+          <View style={[styles.button, styles.buttonContainer]}>
             <Text>Photo by Camera</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={this._selectPhotoByAlbumTapped.bind(this)}>
-          <View style={[styles.avatar, styles.avatarContainer]}>
+          <View style={[styles.button, styles.buttonContainer]}>
             <Text>Photo by Album</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={this._selectVideoByAllTapped.bind(this)}>
-          <View style={[styles.avatar, styles.avatarContainer]}>
+          <View style={[styles.button, styles.buttonContainer]}>
             <Text>Video All</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={this._selectVideoByCameraTapped.bind(this)}>
-          <View style={[styles.avatar, styles.avatarContainer]}>
+          <View style={[styles.button, styles.buttonContainer]}>
             <Text>Video by Camera</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={this._selectVideoByAlbumTapped.bind(this)}>
-          <View style={[styles.avatar, styles.avatarContainer]}>
+          <View style={[styles.button, styles.buttonContainer]}>
             <Text>Video by Album</Text>
           </View>
         </TouchableOpacity>
@@ -200,19 +209,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF'
   },
-  avatarContainer: {
+  buttonContainer: {
     borderColor: '#9B9B9B',
     borderWidth: 1 / PixelRatio.get(),
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20
   },
-  avatar: {
+  button: {
     borderRadius: 75,
     width: 150,
     height: 44
+  },
+  image: {
+    width: 100,
+    height: 100
+  },
+  text: {
+    margin: 8,
+    textAlign: 'center'
   }
-});
+})
 
 const imageOptions = {
   quality: 1.0,
