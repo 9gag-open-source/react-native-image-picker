@@ -19,5 +19,19 @@ module.exports = {
       options = {};
     }
     return ImagePickerManager.showImagePicker({...DEFAULT_OPTIONS, ...options}, callback)
+  },
+  launchImageLibrary: function launchImageLibrary(options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    return ImagePickerManager.launchImageLibrary({...DEFAULT_OPTIONS, ...options}, callback)
+  },
+  launchCamera: function launchCamera(options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    return ImagePickerManager.launchCamera({...DEFAULT_OPTIONS, ...options}, callback)
   }
 }
