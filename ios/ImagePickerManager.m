@@ -29,9 +29,6 @@ RCT_EXPORT_METHOD(downscaleImageIfNecessary:(NSDictionary *)options callback:(RC
     NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
     [info setObject:(NSString *)kUTTypeImage forKey:UIImagePickerControllerMediaType]; //TODO currenly only support kUTTypeImage
     
-    self.callback(@[@{@"error": @"Image not found"}]);
-    return;
-    
     NSString *uri = [options valueForKey:@"uri"]; //origURL
     if (uri) {
         if ([uri rangeOfString:@"file://"].location == NSNotFound) {
