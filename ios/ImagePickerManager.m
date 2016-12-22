@@ -399,7 +399,7 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
                     NSData *data = [NSData dataWithBytesNoCopy:buffer length:buffered freeWhenDone:YES];
                     [data writeToFile:path atomically:YES];
                     
-                    NSMutableDictionary *gifResponse = [[NSMutableDictionary alloc] init];
+                    NSMutableDictionary *gifResponse = [NSMutableDictionary dictionaryWithDictionary:self.response];
                     [gifResponse setObject:@(image.size.width) forKey:@"width"];
                     [gifResponse setObject:@(image.size.height) forKey:@"height"];
                     
