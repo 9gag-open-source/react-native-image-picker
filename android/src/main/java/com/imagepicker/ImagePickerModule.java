@@ -297,6 +297,27 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void downscaleImageIfNecessary(final ReadableMap options, final Callback callback) {
+    response = Arguments.createMap(); // Must create a separate instance of WritableMap to prevent overwritten
+    // Log.d("ImagePickerModule", "downscaleImageIfNecessary: " + options);
+
+    parseOptions(options);
+
+    String uri = null;
+    if (options.hasKey("uri")) {
+      uri = options.getString("uri");
+    }
+
+    if (uri == null) {
+      response.putString("error", "Input uri cannot be null");
+      callback.invoke(response);
+      return;
+    }
+
+    extractImage(Uri.parse(uri), response, callback);
+  }
+
   public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
     //robustness code
     if (mCallback == null || (mCameraCaptureURI == null && requestCode == REQUEST_LAUNCH_IMAGE_CAPTURE)
@@ -341,6 +362,10 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
         uri = null;
     }
 
+    extractImage(uri, response, mCallback);
+  }
+
+  private void extractImage(Uri uri, WritableMap response, Callback callback) {
     String realPath = getRealPathFromURI(uri);
     boolean isUrl = false;
 
@@ -363,8 +388,8 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
         // image not in cache
         response.putString("error", "Could not read photo");
         response.putString("uri", uri.toString());
-        mCallback.invoke(response);
-        mCallback = null;
+        callback.invoke(response);
+        callback = null;
         return;
       }
     }
@@ -414,8 +439,8 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
     } catch (IOException e) {
       e.printStackTrace();
       response.putString("error", e.getMessage());
-      mCallback.invoke(response);
-      mCallback = null;
+      callback.invoke(response);
+      callback = null;
       return;
     }
 
@@ -434,11 +459,11 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
       if (resized == null) {
         response.putString("error", "Can't resize the image");
       } else {
-         realPath = resized.getAbsolutePath();
-         uri = Uri.fromFile(resized);
-         BitmapFactory.decodeFile(realPath, options);
-         response.putInt("width", options.outWidth);
-         response.putInt("height", options.outHeight);
+        realPath = resized.getAbsolutePath();
+        uri = Uri.fromFile(resized);
+        BitmapFactory.decodeFile(realPath, options);
+        response.putInt("width", options.outWidth);
+        response.putInt("height", options.outHeight);
       }
     }
 
@@ -451,8 +476,8 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
 
     putExtraFileInfo(realPath, response);
 
-    mCallback.invoke(response);
-    mCallback = null;
+    callback.invoke(response);
+    callback = null;
   }
 
   /**
