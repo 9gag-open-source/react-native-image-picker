@@ -615,7 +615,21 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
   private File getResizedImage(final String realPath, final int initialWidth, final int initialHeight) {
     Options options = new BitmapFactory.Options();
     options.inScaled = false;
-    Bitmap photo = BitmapFactory.decodeFile(realPath, options);
+    options.inJustDecodeBounds = true;
+
+    Bitmap photo;
+
+    // Decode bounds
+    BitmapFactory.decodeFile(realPath, options);
+    // File may not exist or something went wrong
+    if (options.outHeight == -1 || options.outWidth == -1) {
+      return null;
+    }
+
+    options.inJustDecodeBounds = false;
+    options.inSampleSize = Math.max(calculateInSampleSize(options.outHeight, maxHeight), calculateInSampleSize(options.outWidth, maxWidth));
+
+    photo = BitmapFactory.decodeFile(realPath, options);
 
     if (photo == null) {
         return null;
@@ -637,7 +651,7 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
 
     Matrix matrix = new Matrix();
     matrix.postRotate(rotation);
-    matrix.postScale((float) ratio, (float) ratio);
+//    matrix.postScale((float) ratio, (float) ratio);
 
     ExifInterface exif;
     try {
@@ -655,6 +669,8 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
+    //Log.d("ImagePickerModule", "getResizedImage: w=" + photo.getWidth() + ", h=" + photo.getHeight());
 
     scaledphoto = Bitmap.createBitmap(photo, 0, 0, photo.getWidth(), photo.getHeight(), matrix, true);
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -681,6 +697,15 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
       photo = null;
     }
     return f;
+  }
+
+  private int calculateInSampleSize(int givenSize, int maxSizeBound) {
+    int inSampleSize = 1;
+    if (givenSize > maxSizeBound) {
+      int ratio = Math.round((float) givenSize / (float) maxSizeBound);
+      inSampleSize = ratio;
+    }
+    return inSampleSize;
   }
 
   /**
