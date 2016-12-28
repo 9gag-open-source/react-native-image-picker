@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,9 +15,12 @@ import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -228,7 +232,16 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
 
       // we create a tmp file to save the result
       File imageFile = createNewFile();
-      mCameraCaptureURI = Uri.fromFile(imageFile);
+//      mCameraCaptureURI = Uri.fromFile(imageFile);
+      mCameraCaptureURI = FileProvider.getUriForFile(mReactContext, mReactContext.getApplicationContext().getPackageName() + ".provider", imageFile);
+      cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCameraCaptureURI);
+
+      List<ResolveInfo> resInfoList = mReactContext.getPackageManager().queryIntentActivities(cameraIntent, PackageManager.MATCH_DEFAULT_ONLY);
+      for (ResolveInfo resolveInfo : resInfoList) {
+        String packageName = resolveInfo.activityInfo.packageName;
+        mReactContext.grantUriPermission(packageName, mCameraCaptureURI, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      }
+
       cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCameraCaptureURI);
     }
 
@@ -535,19 +548,25 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
       || mReactContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY);
   }
 
+  @Nullable
   private String getRealPathFromURI(Uri uri) {
-    String result;
-    String[] projection = {MediaStore.Images.Media.DATA};
-    Cursor cursor = mReactContext.getContentResolver().query(uri, projection, null, null, null);
-    if (cursor == null) { // Source is Dropbox or other similar local file path
-      result = uri.getPath();
-    } else {
-      cursor.moveToFirst();
-      int idx = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-      result = cursor.getString(idx);
-      cursor.close();
+    try {
+      String result;
+      String[] projection = {MediaStore.Images.Media.DATA};
+      Cursor cursor = mReactContext.getContentResolver().query(uri, projection, null, null, null);
+      if (cursor == null) { // Source is Dropbox or other similar local file path
+        result = uri.getPath();
+      } else {
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        result = cursor.getString(idx);
+        cursor.close();
+      }
+      return result;
+    } catch (Exception e) {
+      Log.w("ImagePickerModule", "getRealPathFromURI: ", e);
+      return null;
     }
-    return result;
   }
 
   /**
