@@ -531,11 +531,10 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
 
   private boolean permissionsCheck(Activity activity) {
     int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    int cameraPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-    if (writePermission != PackageManager.PERMISSION_GRANTED || cameraPermission != PackageManager.PERMISSION_GRANTED) {
+//    int cameraPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+    if (writePermission != PackageManager.PERMISSION_GRANTED) {
       String[] PERMISSIONS = {
-              Manifest.permission.WRITE_EXTERNAL_STORAGE,
-              Manifest.permission.CAMERA
+              Manifest.permission.WRITE_EXTERNAL_STORAGE
       };
       ActivityCompat.requestPermissions(activity, PERMISSIONS, 1);
       return false;
