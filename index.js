@@ -34,7 +34,7 @@ module.exports = {
     }
     return ImagePickerManager.launchCamera({...DEFAULT_OPTIONS, ...options}, callback)
   },
-  downscaleImageIfNecessary: function launchCamera(options, callback) {
+  downscaleImageIfNecessary: function downscaleImageIfNecessary(options, callback) {
     if (typeof options === 'function') {
       callback = options;
       options = {};
