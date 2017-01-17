@@ -38,7 +38,7 @@ RCT_EXPORT_METHOD(downscaleImageIfNecessary:(NSDictionary *)options callback:(RC
             {
                 ALAssetRepresentation *rep = [myasset defaultRepresentation];
                 @autoreleasepool {
-                    CGImageRef iref = [rep fullScreenImage];
+                    CGImageRef iref = [rep fullResolutionImage];
                     if (iref) {
                         UIImage *image = [UIImage imageWithCGImage:iref];
                         dispatch_async(dispatch_get_main_queue(), ^{
