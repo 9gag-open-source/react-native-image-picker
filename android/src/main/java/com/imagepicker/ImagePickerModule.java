@@ -645,7 +645,16 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
     }
 
     options.inJustDecodeBounds = false;
-    options.inSampleSize = Math.max(calculateInSampleSize(options.outHeight, maxHeight), calculateInSampleSize(options.outWidth, maxWidth));
+    if (maxHeight != 0 && maxWidth != 0) {
+      options.inSampleSize = Math.max(calculateInSampleSize(options.outHeight, maxHeight), calculateInSampleSize(options.outWidth, maxWidth));
+    } else if (maxHeight == 0) {
+      options.inSampleSize = calculateInSampleSize(options.outWidth, maxWidth);
+    } else if (maxWidth == 0) {
+      options.inSampleSize = calculateInSampleSize(options.outWidth, maxHeight);
+    } else {
+      options.inSampleSize = 1;
+    }
+
 
     photo = BitmapFactory.decodeFile(realPath, options);
 
@@ -660,8 +669,8 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
     if (maxHeight == 0 || maxWidth > initialHeight) {
       maxHeight = initialHeight;
     }
-    double widthRatio = (double) maxWidth / initialWidth;
-    double heightRatio = (double) maxHeight / initialHeight;
+    double widthRatio = (double) maxWidth / options.outWidth;
+    double heightRatio = (double) maxHeight / options.outHeight;
 
     double ratio = (widthRatio < heightRatio)
             ? widthRatio
@@ -669,7 +678,7 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
 
     Matrix matrix = new Matrix();
     matrix.postRotate(rotation);
-//    matrix.postScale((float) ratio, (float) ratio);
+    matrix.postScale((float) ratio, (float) ratio);
 
     ExifInterface exif;
     try {
