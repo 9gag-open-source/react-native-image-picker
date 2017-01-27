@@ -39,8 +39,10 @@ RCT_EXPORT_METHOD(downscaleImageIfNecessary:(NSDictionary *)options callback:(RC
                 ALAssetRepresentation *rep = [myasset defaultRepresentation];
                 @autoreleasepool {
                     CGImageRef iref = [rep fullResolutionImage];
+                    ALAssetOrientation orientation = [rep orientation];
+                    CGFloat scale = [rep scale];
                     if (iref) {
-                        UIImage *image = [UIImage imageWithCGImage:iref];
+                        UIImage *image = [UIImage imageWithCGImage:iref scale:scale orientation:orientation];
                         dispatch_async(dispatch_get_main_queue(), ^{
                             if (image) {
                                 [info setObject:image forKey:UIImagePickerControllerOriginalImage];
